@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# argument checking
+if test $# -ne 2 ; then
+    echo $0: wrong number of arguments
+    echo "$0: usage: `basename $0` filename expectedMd5sum/filenameContainingMd5sum"
+    exit 1
+fi
+file=$1
+md5OrFilename=$2
+
+if [[ -r $md5OrFilename ]]; then
+    echo reading md5 from file $md5orfilename
+    expected=$(cat $md5OrFilename)
+else
+    echo using supplied md5 $md5OrFilename
+    expected=$md5OrFilename
+fi
+echo
+
+actual=`md5sum --binary $file | awk '// { print $1; }'`
+echo "  actual checksum: $actual"
+echo "expected checksum: $expected"
+echo
+
+if [[ $expected == $actual ]]; then
+    echo ":-) Life is good (-:"
+else
+    echo ":-( Life is evil )-:"
+    echo "PLEASE USE md5sum --check INSTEAD"
+    exit 1
+fi
