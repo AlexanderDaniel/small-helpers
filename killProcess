@@ -1,0 +1,48 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+
+if (( $# != 1 )); then
+    echo "wrong number of arguments" >&2
+    echo "usage: `basename $0` searchterm" >&2
+    echo
+    echo "Asks for each process matching the searchterm whether you want to kill the process."
+    echo "After executing a normal kill it checks if the process is still running and you can"
+    echo "decide whether you want to kill with -9."
+    echo
+    echo "https://github.com/AlexanderDaniel/small-helpers"
+    exit 1 
+fi
+searchterm=$1
+
+function main() {
+	lines=$(ps -ef | grep -i $searchterm | grep -v -e grep -e killProcess)
+	
+	IFS=$'\n'
+	for line in $lines; do
+	    echo 
+	    read -n 1 -p "Do you want to kill $(echo $line | cut -c 49-) (y/n)?" answer
+	    echo
+	    if [[ "$answer" == "y" ]]; then
+		killIt $(echo $line | awk '{ print $2; }')
+	    fi
+	done
+}
+
+function killIt() {
+    pid=$1
+    echo killing...
+    kill $pid
+    echo sleeping...
+    sleep 1
+    while ps -p $pid | grep -q $pid; do
+	echo Process $pid still running. Press any key to kill it with -9. Sleeping...
+	if read -n 1 -t 1; then
+	    break
+	fi
+    done
+    echo process still running. killing with -9...
+    kill -9 $pid
+}
+
+main
