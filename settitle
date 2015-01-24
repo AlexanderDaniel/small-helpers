@@ -11,5 +11,5 @@ title=$1
 
 echo -ne "\033]0;$title\007"
 
-# http://alvinalexander.com/mac-os-x/how-set-mac-osx-terminal-title-titlebar-echo
-# http://www.tech-recipes.com/rx/705/mac-os-x-change-the-terminal-window-title/
+# http://expertsxchange.blogspot.co.at/2009/02/how-to-set-terminal-title-dynamically.html
+
