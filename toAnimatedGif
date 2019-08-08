@@ -1,0 +1,22 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+
+if (( $# != 1 )); then
+    echo "wrong number of arguments" >&2
+    echo "usage: `basename $0` movie" >&2
+    exit 1 
+fi
+mov=$1
+
+palette=$(mktemp --suffix='.png')
+gif="${mov%.*}.gif"
+
+ffmpeg -y -i "$mov" -vf fps=10,palettegen $palette
+ffmpeg -i "$mov" -i $palette -filter_complex "fps=10,paletteuse" "$gif"
+
+echo
+echo "$gif"
+
+open -a /Applications/Firefox.app/ "$gif"
+
